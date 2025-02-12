@@ -29,9 +29,9 @@ def file_ext(fname):
 
 
 class MidiDataset(Dataset):
-    def __init__(self, midi_list, tokenizer: Union[MIDITokenizerV1, MIDITokenizerV2], max_len=2048, min_file_size=3000,
+    def __init__(self, midi_list, tokenizer: Union[MIDITokenizerV1, MIDITokenizerV2], max_len=8192, min_file_size=3000,
                  max_file_size=384000,
-                 aug=True, check_quality=False, rand_start=True):
+                 aug=True, check_quality=True, rand_start=True):
 
         self.tokenizer = tokenizer
         self.midi_list = midi_list
@@ -311,11 +311,11 @@ if __name__ == '__main__':
     parser.add_argument(
         "--max-len",
         type=int,
-        default=2048,
+        default=8192,
         help="max seq length for training",
     )
     parser.add_argument(
-        "--quality", action="store_true", default=False, help="check dataset quality"
+        "--quality", action="store_true", default=True, help="check dataset quality"
     )
 
     # training args
@@ -323,7 +323,7 @@ if __name__ == '__main__':
     parser.add_argument("--lr", type=float, default=1e-4, help="learning rate")
     parser.add_argument("--weight-decay", type=float, default=0.01, help="weight decay")
     parser.add_argument("--warmup-step", type=int, default=1e2, help="warmup step")
-    parser.add_argument("--max-step", type=int, default=1e6, help="max training step")
+    parser.add_argument("--max-step", type=int, default=5e5, help="max training step")
     parser.add_argument("--grad-clip", type=float, default=1.0, help="gradient clip val")
     parser.add_argument(
         "--sample-seq", action="store_true", default=False, help="sample midi seq to reduce vram"
@@ -332,10 +332,10 @@ if __name__ == '__main__':
         "--gen-example-interval", type=int, default=1, help="generate example interval. set 0 to disable"
     )
     parser.add_argument(
-        "--batch-size-train", type=int, default=2, help="batch size for training"
+        "--batch-size-train", type=int, default=4, help="batch size for training"
     )
     parser.add_argument(
-        "--batch-size-val", type=int, default=2, help="batch size for val"
+        "--batch-size-val", type=int, default=4, help="batch size for val"
     )
     parser.add_argument(
         "--batch-size-gen-example", type=int, default=8, help="batch size for generate example"
@@ -424,8 +424,8 @@ if __name__ == '__main__':
         collate_fn=val_dataset.collate_fn
     )
     print(f"train: {len(train_dataset)}  val: {len(val_dataset)}")
-    torch.backends.cuda.enable_mem_efficient_sdp(True)
-    torch.backends.cuda.enable_flash_sdp(True)
+    #torch.backends.cuda.enable_mem_efficient_sdp(True)
+    #torch.backends.cuda.enable_flash_sdp(True)
     model = TrainMIDIModel(config, lr=opt.lr, weight_decay=opt.weight_decay,
                            warmup=opt.warmup_step, max_step=opt.max_step,
                            sample_seq=opt.sample_seq, gen_example_interval=opt.gen_example_interval,
