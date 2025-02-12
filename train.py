@@ -332,7 +332,7 @@ if __name__ == '__main__':
         "--gen-example-interval", type=int, default=1, help="generate example interval. set 0 to disable"
     )
     parser.add_argument(
-        "--batch-size-train", type=int, default=4, help="batch size for training"
+        "--batch-size-train", type=int, default=6, help="batch size for training"
     )
     parser.add_argument(
         "--batch-size-val", type=int, default=4, help="batch size for val"
