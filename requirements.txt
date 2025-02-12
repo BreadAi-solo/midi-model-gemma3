@@ -8,3 +8,4 @@ lightning==2.4.0
 gradio==5.9.1
 pyfluidsynth
 tqdm
+git+https://github.com/fla-org/flash-linear-attention
