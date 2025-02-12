@@ -7,8 +7,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 import tqdm
 from peft import PeftConfig, LoraModel, load_peft_weights, set_peft_model_state_dict
-from transformers import LlamaModel, LlamaConfig, DynamicCache, PretrainedConfig, PreTrainedModel
-
+from transformers import DynamicCache, PretrainedConfig, PreTrainedModel
+from fla.models import RWKV7Config
+from transformers import AutoModel
 from midi_tokenizer import MIDITokenizerV1, MIDITokenizerV2, MIDITokenizer
 
 config_name_list = ["tv1-medium", "tv2-medium", "tv2o-medium", "tv2-large", "tv2o-large"]
@@ -19,8 +20,8 @@ class MIDIModelConfig(PretrainedConfig):
 
     def __init__(self,
                  tokenizer: Union[MIDITokenizerV1, MIDITokenizerV2, Dict]=None,
-                 net_config: Union[LlamaConfig, Dict]=None,
-                 net_token_config: Union[LlamaConfig, Dict]=None,
+                 net_config: Union[RWKV7Config, Dict]=None,
+                 net_token_config: Union[RWKV7Config, Dict]=None,
                  **kwargs):
         super().__init__(**kwargs)
         if tokenizer:
@@ -33,18 +34,18 @@ class MIDIModelConfig(PretrainedConfig):
             self.tokenizer = MIDITokenizer()
         if net_config:
             if isinstance(net_config, dict):
-                self.net_config = LlamaConfig(**net_config)
+                self.net_config = RWKV7Config(**net_config)
             else:
                 self.net_config = net_config
         else:
-            self.net_config = LlamaConfig()
+            self.net_config = RWKV7Config()
         if net_token_config:
             if isinstance(net_token_config, dict):
-                self.net_token_config = LlamaConfig(**net_token_config)
+                self.net_token_config = RWKV7Config(**net_token_config)
             else:
                 self.net_token_config = net_token_config
         else:
-            self.net_token_config = LlamaConfig()
+            self.net_token_config = RWKV7Config()
         self.n_embd = self.net_token_config.hidden_size
 
     def to_dict(self) -> Dict[str, Any]:
@@ -60,18 +61,18 @@ class MIDIModelConfig(PretrainedConfig):
         return json.dumps(d, indent=4)
 
     @staticmethod
-    def get_config(tokenizer_ver="v2", optimise_midi=True, n_layer=12, n_head=16, n_embd=1024, n_inner=4096):
+    def get_config(tokenizer_ver="v2", optimise_midi=True, n_layer=24, n_head=16, n_embd=1024, n_inner=4096):
         tokenizer = MIDITokenizer(tokenizer_ver)
         tokenizer.set_optimise_midi(optimise_midi)
-        net_config = LlamaConfig(vocab_size=tokenizer.vocab_size,
+        net_config = RWKV7Config(vocab_size=tokenizer.vocab_size,
                                  hidden_size=n_embd, num_attention_heads=n_head,
                                  num_hidden_layers=n_layer, intermediate_size=n_inner,
-                                 pad_token_id=tokenizer.pad_id, max_position_embeddings=4096,
+                                 pad_token_id=tokenizer.pad_id, max_position_embeddings=8192,
                                  use_cache=False)
-        net_token_config = LlamaConfig(vocab_size=tokenizer.vocab_size,
+        net_token_config = RWKV7Config(vocab_size=tokenizer.vocab_size,
                                        hidden_size=n_embd, num_attention_heads=n_head // 4,
                                        num_hidden_layers=n_layer // 4, intermediate_size=n_inner // 4,
-                                       pad_token_id=tokenizer.pad_id, max_position_embeddings=4096,
+                                       pad_token_id=tokenizer.pad_id, max_position_embeddings=8192,
                                        use_cache=False)
         return MIDIModelConfig(tokenizer, net_config, net_token_config)
 
@@ -102,8 +103,8 @@ class MIDIModel(PreTrainedModel):
     def __init__(self, config: MIDIModelConfig, *args, **kwargs):
         super(MIDIModel, self).__init__(config, *args, **kwargs)
         self.tokenizer = config.tokenizer
-        self.net = LlamaModel(config.net_config)
-        self.net_token = LlamaModel(config.net_token_config)
+        self.net = AutoModel.from_config(config.net_config)
+        self.net_token = AutoModel.from_config(config.net_token_config)
         self.lm_head = nn.Linear(config.n_embd, self.tokenizer.vocab_size, bias=False)
 
     def load_merge_lora(self, model_id):
