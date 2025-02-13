@@ -103,8 +103,8 @@ class MIDIModel(PreTrainedModel):
     def __init__(self, config: MIDIModelConfig, *args, **kwargs):
         super(MIDIModel, self).__init__(config, *args, **kwargs)
         self.tokenizer = config.tokenizer
-        self.net = AutoModel.from_config(config.net_config)
-        self.net_token = AutoModel.from_config(config.net_token_config)
+        self.net = AutoModel.from_config(config.net_config,trust_remote_code=True)
+        self.net_token = AutoModel.from_config(config.net_token_config,trust_remote_code=True)
         self.lm_head = nn.Linear(config.n_embd, self.tokenizer.vocab_size, bias=False)
 
     def load_merge_lora(self, model_id):
