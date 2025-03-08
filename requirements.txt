@@ -1,6 +1,6 @@
 Pillow
 numpy
-torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm5.6
+--pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/rocm6.2.4/
 safetensors
 peft>=0.13.0
 transformers>=4.36
