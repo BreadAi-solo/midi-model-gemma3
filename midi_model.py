@@ -8,7 +8,7 @@ import torch.nn.functional as F
 import tqdm
 from peft import PeftConfig, LoraModel, load_peft_weights, set_peft_model_state_dict
 from transformers import DynamicCache, PretrainedConfig, PreTrainedModel
-from transformers import Phi3Config as RWKV7Config
+from transformers import Gemma3Config as RWKV7Config
 from transformers import AutoModel
 from midi_tokenizer import MIDITokenizerV1, MIDITokenizerV2, MIDITokenizer
 
