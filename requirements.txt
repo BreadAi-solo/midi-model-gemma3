@@ -2,7 +2,7 @@ Pillow
 numpy
 safetensors
 peft>=0.13.0
-transformers>=4.36
+git+https://github.com/huggingface/transformers@v4.49.0-Gemma-3
 lightning==2.4.0
 gradio==5.9.1
 pyfluidsynth
