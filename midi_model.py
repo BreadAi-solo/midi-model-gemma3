@@ -68,12 +68,12 @@ class MIDIModelConfig(PretrainedConfig):
                                  hidden_size=n_embd, num_attention_heads=n_head,
                                  num_hidden_layers=n_layer, intermediate_size=n_inner,
                                  pad_token_id=tokenizer.pad_id, max_position_embeddings=8192,
-                                 use_cache=False, sliding_window=1024)
+                                 use_cache=False, sliding_window=1024, num_key_value_heads=n_head // 2)
         net_token_config = RWKV7Config(vocab_size=tokenizer.vocab_size,
                                        hidden_size=n_embd, num_attention_heads=n_head // 4,
                                        num_hidden_layers=n_layer // 4, intermediate_size=n_inner // 4,
                                        pad_token_id=tokenizer.pad_id, max_position_embeddings=8192,
-                                       use_cache=False, sliding_window=1024)
+                                       use_cache=False, sliding_window=1024, num_key_value_heads=1)
         return MIDIModelConfig(tokenizer, net_config, net_token_config)
 
     @staticmethod
