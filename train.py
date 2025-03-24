@@ -323,7 +323,7 @@ if __name__ == '__main__':
     parser.add_argument("--lr", type=float, default=1e-4, help="learning rate")
     parser.add_argument("--weight-decay", type=float, default=0.01, help="weight decay")
     parser.add_argument("--warmup-step", type=int, default=1e2, help="warmup step")
-    parser.add_argument("--max-step", type=int, default=3.5e5, help="max training step")
+    parser.add_argument("--max-step", type=int, default=175000, help="max training step")
     parser.add_argument("--grad-clip", type=float, default=1.0, help="gradient clip val")
     parser.add_argument(
         "--sample-seq", action="store_true", default=False, help="sample midi seq to reduce vram"
@@ -332,7 +332,7 @@ if __name__ == '__main__':
         "--gen-example-interval", type=int, default=1, help="generate example interval. set 0 to disable"
     )
     parser.add_argument(
-        "--batch-size-train", type=int, default=6, help="batch size for training"
+        "--batch-size-train", type=int, default=16, help="batch size for training"
     )
     parser.add_argument(
         "--batch-size-val", type=int, default=4, help="batch size for val"
