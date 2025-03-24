@@ -292,7 +292,7 @@ if __name__ == '__main__':
         "--ckpt", type=str, default="", help="load ckpt"
     )
     parser.add_argument(
-        "--config", type=str, default="tv2o-large", help="model config name or file"
+        "--config", type=str, default="tv2o-medium", help="model config name or file"
     )
     parser.add_argument(
         "--task", type=str, default="train", choices=["train", "lora"], help="Full train or lora"
